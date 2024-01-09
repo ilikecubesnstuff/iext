@@ -1,0 +1,25 @@
+[project]
+name = "iext"
+version = "0.0.1"
+description = "Python import extension metaclass."
+authors = [
+    {name = "ilikecubesnstuff", email = "25328250+ilikecubesnstuff@users.noreply.github.com"},
+]
+dependencies = []
+requires-python = ">=3.8"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+package-type = "library"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.4.4",
+    "tox>=4.11.4",
+]
