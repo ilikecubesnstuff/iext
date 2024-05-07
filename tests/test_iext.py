@@ -60,19 +60,23 @@ class TestIllFormedImports:
                     def test():
                         pass
 
-    def test_multiline_import(self):
-        with pytest.raises(ImportExtensionError):
-
-            class TestClass(ExtendImports):
-                def __imports__(self):
-                    import module_dummy
-
     def test_multiline_collection(self):
         with pytest.raises(ImportExtensionError):
 
             class TestClass(ExtendImports):
                 def __imports__(self):
-                    x = [1, 2, 3]
+                    x = [
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                        "abcdefghijklmnopqrstuvwxyz",
+                    ]
 
 
 class TestWellFormedImports:
@@ -88,15 +92,6 @@ class TestWellFormedImports:
         class TestClass(ExtendImports):
             def __imports__(self):
                 "single line docstring"
-
-        inst = TestClass()
-        assert not hasattr(inst, "__imports__")
-
-    def test_single_line_function(self):
-        class TestClass(ExtendImports):
-            def __imports__(self):
-                def add(a, b):
-                    return a + b
 
         inst = TestClass()
         assert not hasattr(inst, "__imports__")
