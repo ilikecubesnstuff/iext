@@ -1,6 +1,6 @@
 [project]
 name = "iext"
-version = "1.0.0"
+version = "1.1.0"
 description = "Python import extension metaclass."
 authors = [
     {name = "ilikecubesnstuff", email = "25328250+ilikecubesnstuff@users.noreply.github.com"},
