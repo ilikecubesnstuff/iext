@@ -1,5 +1,6 @@
 import inspect
 import textwrap
+import warnings
 
 
 def _unavailable(e):
@@ -18,6 +19,14 @@ def _unavailable(e):
     return Unavailable
 
 
+class ImportExtensionError(Exception):
+    """
+    Base class for all exceptions raised by the import extension module.
+    """
+
+    pass
+
+
 class ExtendImportsMeta(type):
     """
     A metaclass that dynamically extends classes with additional imports.
@@ -29,22 +38,40 @@ class ExtendImportsMeta(type):
     instantiation.
     """
 
-    def __imports__():
-        """
-        This method name must be used to define additional imports.
-        """
-        pass
-
     def __new__(metacls, name, bases, namespace):
         """
         Create a new class with dynamically injected imports.
         """
-        imports = namespace.pop("__imports__", metacls.__imports__)
-        src = inspect.getsource(imports)
-        *_, body = src.partition("\n")
+        if "__imports__" not in namespace:
+            return super().__new__(metacls, name, bases, namespace)
+
+        __imports__ = namespace.pop("__imports__")
+
+        src_file = inspect.getsourcefile(__imports__)
+        src_lines, line_number = inspect.getsourcelines(__imports__)
+        src = "".join(src_lines)
+
+        _, _, src = src.partition("\n")
+        line_number += 1
+        src = textwrap.dedent(src)
+
         try:
-            exec(textwrap.dedent(body), {}, namespace)
+            for line in src.split("\n"):
+                exec(line, {}, namespace)
+                line_number += 1
         except ModuleNotFoundError as e:
+            return _unavailable(e)
+        except SyntaxError as e:
+            raise ImportExtensionError(
+                f"the __imports__ body must contain no docstrings or multi-line expressions."
+            )
+        except Exception as e:
+            warnings.warn_explicit(
+                f"failed to create {name} due to {e.__class__.__name__}: {e}",
+                UserWarning,
+                src_file,
+                line_number,
+            )
             return _unavailable(e)
         return super().__new__(metacls, name, bases, namespace)
 
